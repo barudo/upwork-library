@@ -1,5 +1,28 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+In this exercise we will implement a Library web application
+The Library will connect to a DB, either Mongo or SqlExpress.
+The database should be called Library.
+Books will have an Id, a Title, an Author name and a Genre. (no need for type or count of books)
+Subscribers will have an Id, a First name, a Last name and a list of all Books under loan – either the book id, or an entire Book object. A subscriber can loan up to 3 books.
+The same book can be loaned as many times as we want.
+If using Mongo, create two collections under the Library database.
+If using SqlExpress, create two tables in the Library database.
+
+The application should include at least 4 razor pages:
+Home- will contain links or button to the other 3 pages
+Manage Library- Add subscribers, Add Books
+Loan/Return Books- by Id
+Display Information – about a subscriber, about a book, about a genre
+
+Use Forms for supplying the data. 
+Use Tag handlers, Binding and routing where it is appropriate.
+The DB should be registered as a service and its configuration should also be registered.
+You don’t have to use asynchronous programming, but it is recommended.
+Feel free to add behavior if you wish – delete book (but only if it is not on loan), delete subscriber, loan book by name..
+Use CSS and html/js as much as you can
+
+
 ## Getting Started
 
 First, run the development server:
