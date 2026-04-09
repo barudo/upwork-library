@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import LoanedToList from "@/components/LoanedToList";
 
 interface Book {
   _id: string;
@@ -7,18 +8,27 @@ interface Book {
   title: string;
   author: string;
   genre: string;
+  loanedTo?: Array<{
+    _id?: string;
+    id?: number;
+    firstName?: unknown;
+    lastName?: unknown;
+  }>;
 }
 
 async function getBook(id: string): Promise<Book | null> {
   const baseUrl = process.env.API_URL ?? "http://localhost:3000";
-  const res = await fetch(`${baseUrl}/api/books`, {
+  const res = await fetch(`${baseUrl}/api/books/${id}`, {
     cache: "no-store",
   });
   if (!res.ok) {
-    throw new Error("Failed to fetch books");
+    if (res.status === 404) {
+      return null;
+    }
+    throw new Error("Failed to fetch book");
   }
-  const books: Book[] = await res.json();
-  return books.find((book) => book._id === id) || null;
+  const book: Book = await res.json();
+  return book;
 }
 
 interface PageProps {
@@ -32,6 +42,38 @@ export default async function BookPage({ params }: PageProps) {
   if (!book) {
     notFound();
   }
+
+  const rawLoanedTo = (book as Book & { loanedTo?: unknown }).loanedTo;
+  const loanedTo =
+    Array.isArray(rawLoanedTo) && rawLoanedTo.length > 0
+      ? rawLoanedTo
+      : rawLoanedTo
+        ? [rawLoanedTo]
+        : [];
+  const normalizeId = (value: unknown) =>
+    typeof value === "string" ? value : JSON.stringify(value) ?? String(value);
+  const loanedToItems = loanedTo
+    .map((subscriber) => {
+      const rawId =
+        typeof subscriber._id === "string"
+          ? subscriber._id
+          : typeof subscriber.id === "number"
+            ? String(subscriber.id)
+            : subscriber._id ?? subscriber.id;
+      const idText = normalizeId(rawId);
+      const firstName =
+        typeof subscriber.firstName === "string" ? subscriber.firstName : "";
+      const lastName =
+        typeof subscriber.lastName === "string" ? subscriber.lastName : "";
+      const fullName = [firstName, lastName].filter(Boolean).join(" ");
+
+      return idText ? { id: idText, fullName } : null;
+    })
+    .filter(
+      (item): item is { id: string; fullName: string } =>
+        Boolean(item?.id && item.fullName),
+    );
+  const bookIdText = normalizeId(book._id);
 
   return (
     <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
@@ -54,8 +96,14 @@ export default async function BookPage({ params }: PageProps) {
               <strong>Genre:</strong> {book.genre}
             </p>
             <p className="text-zinc-600 dark:text-zinc-400">
-              <strong>MongoDB ID:</strong> {book._id}
+              <strong>MongoDB ID:</strong> {bookIdText}
             </p>
+          </div>
+          <div className="text-lg">
+            <h2 className="text-xl font-semibold text-black dark:text-zinc-50 mb-2">
+              Loaned To
+            </h2>
+            <LoanedToList bookId={id} subscribers={loanedToItems} />
           </div>
         </div>
       </main>

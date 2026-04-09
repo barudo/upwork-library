@@ -11,8 +11,9 @@ interface Book {
 }
 
 async function getBooksByGenre(genre: string): Promise<Book[]> {
+  const baseUrl = process.env.API_URL ?? "http://localhost:3000";
   const res = await fetch(
-    `http://localhost:3000/api/genres/${encodeURIComponent(genre)}`,
+    `${baseUrl}/api/genres/${encodeURIComponent(genre)}`,
     {
       cache: "no-store",
     },
