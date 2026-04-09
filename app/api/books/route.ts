@@ -44,21 +44,19 @@ export async function GET(request: Request) {
           {
             $match: {
               $expr: {
-                $in: [
-                  "$$bookId",
+                $gt: [
                   {
-                    $cond: [
-                      { $isArray: "$loans" },
-                      {
-                        $map: {
-                          input: "$loans",
-                          as: "loan",
-                          in: "$$loan.bookId",
+                    $size: {
+                      $filter: {
+                        input: {
+                          $cond: [{ $isArray: "$loans" }, "$loans", []],
                         },
+                        as: "loan",
+                        cond: { $eq: ["$$loan.bookId", "$$bookId"] },
                       },
-                      [],
-                    ],
+                    },
                   },
+                  0,
                 ],
               },
             },
