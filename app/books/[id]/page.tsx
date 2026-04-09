@@ -36,10 +36,10 @@ export default async function BookPage({ params }: PageProps) {
     <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
       <main className="flex flex-1 w-full max-w-3xl flex-col py-32 px-16 bg-white dark:bg-black sm:items-start">
         <Link
-          href="/books"
+          href="/manage?tab=books"
           className="text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white mb-8"
         >
-          ← Back to Books
+          ← Back to Manage Library
         </Link>
         <div className="flex flex-col gap-6">
           <h1 className="text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">

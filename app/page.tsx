@@ -15,7 +15,7 @@ export default function Home() {
           </p>
           <div className="flex gap-4">
             <Link
-              href="/subscribers"
+              href="/manage"
               className="rounded-md bg-black px-4 py-2 text-white hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
             >
               Manage Library
