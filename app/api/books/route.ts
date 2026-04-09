@@ -40,14 +40,30 @@ export async function GET(request: Request) {
       $lookup: {
         from: "subscribers",
         let: { bookId: "$_id" },
-        pipeline: [{ $match: { $expr: { $in: ["$$bookId", "$loans"] } } }],
-        as: "borrower",
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $in: ["$$bookId", "$loans"],
+              },
+            },
+          },
+          {
+            $project: {
+              _id: 0,
+              id: 1,
+              firstName: 1,
+              lastName: 1,
+            },
+          },
+        ],
+        as: "loanedTo",
       },
     });
 
     pipeline.push({
       $addFields: {
-        borrower: { $ifNull: [{ $arrayElemAt: ["$borrower", 0] }, null] },
+        borrower: { $ifNull: [{ $arrayElemAt: ["$loanedTo", 0] }, null] },
       },
     });
 

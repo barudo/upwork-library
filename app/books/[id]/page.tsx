@@ -10,7 +10,8 @@ interface Book {
 }
 
 async function getBook(id: string): Promise<Book | null> {
-  const res = await fetch("http://localhost:3000/api/books", {
+  const baseUrl = process.env.API_URL ?? "http://localhost:3000";
+  const res = await fetch(`${baseUrl}/api/books`, {
     cache: "no-store",
   });
   if (!res.ok) {

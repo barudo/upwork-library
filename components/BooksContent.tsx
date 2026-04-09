@@ -74,14 +74,6 @@ export default function BooksContent() {
     fetchBooks(searchQuery); // Refresh the books list
   };
 
-  if (loading) {
-    return (
-      <div className="text-zinc-600 dark:text-zinc-400">
-        Loading books...
-      </div>
-    );
-  }
-
   return (
     <>
       <div className="flex flex-col gap-4 mb-8 sm:flex-row sm:items-center sm:justify-between">
@@ -128,7 +120,11 @@ export default function BooksContent() {
           </button>
         </div>
       </div>
-      {displayMode === "grid" ? (
+      {loading ? (
+        <div className="text-zinc-600 dark:text-zinc-400">
+          Loading books...
+        </div>
+      ) : displayMode === "grid" ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {books.map((book) => (
             <Link
