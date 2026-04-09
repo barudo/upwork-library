@@ -47,10 +47,11 @@ export async function GET(request: Request) {
                 $in: [
                   "$$bookId",
                   {
-                    $ifNull: [
+                    $cond: [
+                      { $isArray: "$loans" },
                       {
                         $map: {
-                          input: { $ifNull: ["$loans", []] },
+                          input: "$loans",
                           as: "loan",
                           in: "$$loan.bookId",
                         },
