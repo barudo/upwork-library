@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import LoanedToList from "@/components/LoanedToList";
+import LoanBookButton from "@/components/LoanBookButton";
 
 interface Book {
   _id: string;
@@ -100,9 +101,12 @@ export default async function BookPage({ params }: PageProps) {
             </p>
           </div>
           <div className="text-lg">
-            <h2 className="text-xl font-semibold text-black dark:text-zinc-50 mb-2">
-              Loaned To
-            </h2>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h2 className="text-xl font-semibold text-black dark:text-zinc-50">
+                Loaned To
+              </h2>
+              <LoanBookButton bookId={id} />
+            </div>
             <LoanedToList bookId={id} subscribers={loanedToItems} />
           </div>
         </div>

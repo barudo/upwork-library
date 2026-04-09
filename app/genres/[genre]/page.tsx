@@ -46,10 +46,10 @@ export default async function GenrePage({ params }: PageProps) {
     <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
       <main className="flex flex-1 w-full max-w-4xl flex-col py-32 px-16 bg-white dark:bg-black">
         <Link
-          href="/books"
+          href="/manage"
           className="text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white mb-8"
         >
-          ← Back to Books
+          ← Back to Manage Library
         </Link>
         <h1 className="text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50 mb-8">
           {getGenreDisplayName(genre)} Books

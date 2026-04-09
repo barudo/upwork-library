@@ -36,7 +36,8 @@ export async function POST(
     const body = await request.json();
     const { book } = body;
 
-    if (!book) {
+    const bookValue = Array.isArray(book) ? book[0] : book;
+    if (!bookValue) {
       return NextResponse.json(
         { error: "Book ID is required" },
         { status: 400 },
@@ -44,7 +45,7 @@ export async function POST(
     }
 
     const subscriberObjectId = new ObjectId(subscriberId);
-    const bookObjectId = new ObjectId(book);
+    const bookObjectId = new ObjectId(bookValue);
 
     const client = new MongoClient(uri);
     await client.connect();
@@ -134,7 +135,8 @@ export async function DELETE(
     const body = await request.json();
     const { book } = body;
 
-    if (!book) {
+    const bookValue = Array.isArray(book) ? book[0] : book;
+    if (!bookValue) {
       return NextResponse.json(
         { error: "Book ID is required" },
         { status: 400 },
@@ -142,7 +144,7 @@ export async function DELETE(
     }
 
     const subscriberObjectId = new ObjectId(subscriberId);
-    const bookObjectId = new ObjectId(book);
+    const bookObjectId = new ObjectId(bookValue);
 
     const client = new MongoClient(uri);
     await client.connect();

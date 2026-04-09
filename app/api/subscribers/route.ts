@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { MongoClient } from "mongodb";
+import { MongoClient, ObjectId } from "mongodb";
 
-export async function GET() {
+export async function GET(request: Request) {
   const uri = process.env.MONGODB_URI;
   if (!uri) {
     return NextResponse.json(
@@ -10,6 +10,9 @@ export async function GET() {
     );
   }
 
+  const { searchParams } = new URL(request.url);
+  const query = searchParams.get("q");
+
   const client = new MongoClient(uri);
 
   try {
@@ -17,7 +20,24 @@ export async function GET() {
     const database = client.db("upwork-library");
     const subscribers = database.collection("subscribers");
 
-    const subscribersData = await subscribers.find({}).toArray();
+    const trimmedQuery = query?.trim();
+    let objectIdFilter: ObjectId | null = null;
+    if (trimmedQuery && ObjectId.isValid(trimmedQuery)) {
+      objectIdFilter = new ObjectId(trimmedQuery);
+    }
+
+    const filter =
+      trimmedQuery
+        ? {
+            $or: [
+              { firstName: new RegExp(trimmedQuery, "i") },
+              { lastName: new RegExp(trimmedQuery, "i") },
+              ...(objectIdFilter ? [{ _id: objectIdFilter }] : []),
+            ],
+          }
+        : {};
+
+    const subscribersData = await subscribers.find(filter).toArray();
     return NextResponse.json(subscribersData);
   } catch (error) {
     console.error("Database error:", error);

@@ -44,7 +44,21 @@ export async function GET(request: Request) {
           {
             $match: {
               $expr: {
-                $in: ["$$bookId", { $ifNull: ["$loans.bookId", []] }],
+                $in: [
+                  "$$bookId",
+                  {
+                    $ifNull: [
+                      {
+                        $map: {
+                          input: { $ifNull: ["$loans", []] },
+                          as: "loan",
+                          in: "$$loan.bookId",
+                        },
+                      },
+                      [],
+                    ],
+                  },
+                ],
               },
             },
           },
