@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface LoanedToItem {
   id: string;
@@ -21,6 +21,10 @@ export default function LoanedToList({
   const [items, setItems] = useState<LoanedToItem[]>(subscribers);
   const [submittingId, setSubmittingId] = useState<string | null>(null);
 
+  useEffect(() => {
+    setItems(subscribers);
+  }, [subscribers]);
+
   const handleReturnBook = async (subscriberId: string) => {
     setSubmittingId(subscriberId);
     try {
@@ -29,7 +33,7 @@ export default function LoanedToList({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ book: bookId }),
+        body: JSON.stringify({ book: [bookId] }),
       });
 
       if (!res.ok) {
