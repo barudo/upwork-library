@@ -45,12 +45,19 @@ export default async function BookPage({ params }: PageProps) {
   }
 
   const rawLoanedTo = (book as Book & { loanedTo?: unknown }).loanedTo;
-  const loanedTo =
-    Array.isArray(rawLoanedTo) && rawLoanedTo.length > 0
-      ? rawLoanedTo
-      : rawLoanedTo
-        ? [rawLoanedTo]
-        : [];
+  type LoanedToEntry = {
+    _id?: unknown;
+    id?: unknown;
+    firstName?: unknown;
+    lastName?: unknown;
+  };
+  const isLoanedToEntry = (value: unknown): value is LoanedToEntry =>
+    Boolean(value) && typeof value === "object" && !Array.isArray(value);
+  const loanedTo: LoanedToEntry[] = Array.isArray(rawLoanedTo)
+    ? rawLoanedTo.filter(isLoanedToEntry)
+    : isLoanedToEntry(rawLoanedTo)
+      ? [rawLoanedTo]
+      : [];
   const normalizeId = (value: unknown) =>
     typeof value === "string" ? value : JSON.stringify(value) ?? String(value);
   const loanedToItems = loanedTo
