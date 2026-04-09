@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useState, useEffect, useCallback, use } from "react";
 import { useParams } from "next/navigation";
+import EditSubscriberButton from "@/components/EditSubscriberButton";
+import DeleteSubscriberButton from "@/components/DeleteSubscriberButton";
 
 interface LoanItem {
   bookId: string;
@@ -150,9 +152,18 @@ export default function SubscriberPage({ params }: PageProps) {
             Subscriber Details
           </h1>
           <div className="text-lg space-y-3">
-            <p className="text-zinc-600 dark:text-zinc-400">
-              <strong>Full name:</strong> {fullName}
-            </p>
+            <div className="flex flex-wrap items-center gap-3">
+              <p className="text-zinc-600 dark:text-zinc-400">
+                <strong>Full name:</strong> {fullName}
+              </p>
+              <EditSubscriberButton
+                subscriberId={subscriber._id}
+                firstName={subscriber.firstName}
+                lastName={subscriber.lastName}
+                onUpdated={fetchSubscriber}
+              />
+              <DeleteSubscriberButton subscriberId={subscriber._id} />
+            </div>
             <p className="text-zinc-600 dark:text-zinc-400">
               <strong>Subscriber ID:</strong> {subscriber._id}
             </p>

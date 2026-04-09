@@ -2,6 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import LoanedToList from "@/components/LoanedToList";
 import LoanBookButton from "@/components/LoanBookButton";
+import EditBookButton from "@/components/EditBookButton";
+import DeleteBookButton from "@/components/DeleteBookButton";
 
 interface Book {
   _id: string;
@@ -93,9 +95,18 @@ export default async function BookPage({ params }: PageProps) {
           ← Back to Manage Library
         </Link>
         <div className="flex flex-col gap-6">
-          <h1 className="text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            {book.title}
-          </h1>
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
+              {book.title}
+            </h1>
+            <EditBookButton
+              bookId={id}
+              title={book.title}
+              author={book.author}
+              genre={book.genre}
+            />
+            <DeleteBookButton bookId={id} />
+          </div>
           <div className="text-lg">
             <p className="text-zinc-600 dark:text-zinc-400 mb-2">
               <strong>Author:</strong> {book.author}

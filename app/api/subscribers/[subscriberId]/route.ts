@@ -78,3 +78,150 @@ export async function GET(
     await client.close();
   }
 }
+
+export async function PUT(
+  request: Request,
+  { params }: { params: Promise<{ subscriberId: string }> },
+) {
+  const uri = process.env.MONGODB_URI;
+  if (!uri) {
+    return NextResponse.json(
+      { error: "Database connection not configured" },
+      { status: 500 },
+    );
+  }
+
+  const { subscriberId } = await params;
+  if (!subscriberId) {
+    return NextResponse.json(
+      { error: "Subscriber ID is required" },
+      { status: 400 },
+    );
+  }
+
+  let subscriberObjectId: ObjectId;
+  try {
+    subscriberObjectId = new ObjectId(subscriberId);
+  } catch {
+    return NextResponse.json(
+      { error: "Invalid subscriber ID" },
+      { status: 400 },
+    );
+  }
+
+  try {
+    const body = await request.json();
+    const { firstName, lastName } = body;
+
+    if (!firstName || !lastName) {
+      return NextResponse.json(
+        { error: "First name and last name are required" },
+        { status: 400 },
+      );
+    }
+
+    const client = new MongoClient(uri);
+    await client.connect();
+    const database = client.db("upwork-library");
+    const subscribers = database.collection("subscribers");
+
+    const result = await subscribers.updateOne(
+      { _id: subscriberObjectId },
+      {
+        $set: {
+          firstName: String(firstName).trim(),
+          lastName: String(lastName).trim(),
+        },
+      },
+    );
+
+    await client.close();
+
+    if (result.matchedCount === 0) {
+      return NextResponse.json(
+        { error: "Subscriber not found" },
+        { status: 404 },
+      );
+    }
+
+    return NextResponse.json({ message: "Subscriber updated successfully" });
+  } catch (error) {
+    console.error("Subscriber update error:", error);
+    return NextResponse.json(
+      { error: "Failed to update subscriber" },
+      { status: 500 },
+    );
+  }
+}
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ subscriberId: string }> },
+) {
+  const uri = process.env.MONGODB_URI;
+  if (!uri) {
+    return NextResponse.json(
+      { error: "Database connection not configured" },
+      { status: 500 },
+    );
+  }
+
+  const { subscriberId } = await params;
+  if (!subscriberId) {
+    return NextResponse.json(
+      { error: "Subscriber ID is required" },
+      { status: 400 },
+    );
+  }
+
+  let subscriberObjectId: ObjectId;
+  try {
+    subscriberObjectId = new ObjectId(subscriberId);
+  } catch {
+    return NextResponse.json(
+      { error: "Invalid subscriber ID" },
+      { status: 400 },
+    );
+  }
+
+  const client = new MongoClient(uri);
+  try {
+    await client.connect();
+    const database = client.db("upwork-library");
+    const subscribers = database.collection("subscribers");
+
+    const subscriber = await subscribers.findOne({ _id: subscriberObjectId });
+    if (!subscriber) {
+      return NextResponse.json(
+        { error: "Subscriber not found" },
+        { status: 404 },
+      );
+    }
+
+    const loans = Array.isArray(subscriber.loans) ? subscriber.loans : [];
+    if (loans.length > 0) {
+      return NextResponse.json(
+        { error: "Subscriber has borrowed books and cannot be deleted" },
+        { status: 400 },
+      );
+    }
+
+    const result = await subscribers.deleteOne({ _id: subscriberObjectId });
+    if (result.deletedCount === 0) {
+      return NextResponse.json(
+        { error: "Subscriber not found" },
+        { status: 404 },
+      );
+    }
+
+    return NextResponse.json({ message: "Subscriber deleted successfully" });
+  } catch (error) {
+    console.error("Subscriber delete error:", error);
+    return NextResponse.json(
+      { error: "Failed to delete subscriber" },
+      { status: 500 },
+    );
+  } finally {
+    await client.close();
+  }
+}
