@@ -1,6 +1,16 @@
 import { NextResponse } from "next/server";
 import { MongoClient, ObjectId } from "mongodb";
 
+interface SubscriberLoan {
+  bookId: ObjectId;
+  loanedAt: Date;
+}
+
+interface SubscriberDoc {
+  _id: ObjectId;
+  loans?: SubscriberLoan[];
+}
+
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ subscriberId: string }> },
@@ -39,7 +49,7 @@ export async function POST(
     const client = new MongoClient(uri);
     await client.connect();
     const database = client.db("upwork-library");
-    const subscribers = database.collection("subscribers");
+    const subscribers = database.collection<SubscriberDoc>("subscribers");
 
     // Check current loan count
     const subscriber = await subscribers.findOne({ _id: subscriberObjectId });
@@ -62,14 +72,17 @@ export async function POST(
       );
     }
 
-    const result = await subscribers.updateOne({ _id: subscriberObjectId }, {
-      $push: {
-        loans: {
-          bookId: bookObjectId,
-          loanedAt: new Date(),
+    const result = await subscribers.updateOne(
+      { _id: subscriberObjectId },
+      {
+        $push: {
+          loans: {
+            bookId: bookObjectId,
+            loanedAt: new Date(),
+          },
         },
       },
-    } as const);
+    );
 
     await client.close();
 
@@ -134,7 +147,7 @@ export async function DELETE(
     const client = new MongoClient(uri);
     await client.connect();
     const database = client.db("upwork-library");
-    const subscribers = database.collection("subscribers");
+    const subscribers = database.collection<SubscriberDoc>("subscribers");
 
     const result = await subscribers.updateOne(
       { _id: subscriberObjectId },

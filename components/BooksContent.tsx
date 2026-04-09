@@ -24,10 +24,16 @@ export default function BooksContent() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [displayMode, setDisplayMode] = useState<"grid" | "table">("grid");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isReady, setIsReady] = useState(false);
 
-  const fetchBooks = async () => {
+  const fetchBooks = async (query: string) => {
+    setLoading(true);
     try {
-      const res = await fetch("http://localhost:3000/api/books", {
+      const url = query.trim()
+        ? `/api/books?q=${encodeURIComponent(query.trim())}`
+        : "/api/books";
+      const res = await fetch(url, {
         cache: "no-store",
       });
       if (!res.ok) {
@@ -43,11 +49,29 @@ export default function BooksContent() {
   };
 
   useEffect(() => {
-    fetchBooks();
+    const query = new URLSearchParams(window.location.search).get("q") ?? "";
+    setSearchQuery(query);
+    setIsReady(true);
   }, []);
 
+  useEffect(() => {
+    if (!isReady) {
+      return;
+    }
+    const params = new URLSearchParams(window.location.search);
+    if (searchQuery.trim()) {
+      params.set("q", searchQuery.trim());
+    } else {
+      params.delete("q");
+    }
+    const search = params.toString();
+    const nextUrl = search ? `${window.location.pathname}?${search}` : window.location.pathname;
+    window.history.replaceState(null, "", nextUrl);
+    fetchBooks(searchQuery);
+  }, [isReady, searchQuery]);
+
   const handleBookAdded = () => {
-    fetchBooks(); // Refresh the books list
+    fetchBooks(searchQuery); // Refresh the books list
   };
 
   if (loading) {
@@ -60,10 +84,19 @@ export default function BooksContent() {
 
   return (
     <>
-      <div className="flex justify-between items-center mb-8">
-        <h2 className="text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-          Books
-        </h2>
+      <div className="flex flex-col gap-4 mb-8 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 sm:gap-4 sm:flex-row sm:items-center">
+          <h2 className="text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
+            Books
+          </h2>
+          <input
+            type="search"
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            placeholder="Search title, author, genre"
+            className="w-full sm:w-72 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-black placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-black dark:border-zinc-600 dark:bg-black dark:text-zinc-50 dark:placeholder:text-zinc-500 dark:focus:ring-zinc-50"
+          />
+        </div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setDisplayMode("grid")}

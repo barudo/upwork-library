@@ -1,5 +1,15 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+Hi,
+
+I would be happy, if you can help me with this job that has on the word description on the file attached to the post.
+
+I need a little web project for my assessment.
+
+I prefer to do it on .net core, but if you want, you can do it also in nodejs.
+
+Thank you :).
+
 In this exercise we will implement a Library web application
 The Library will connect to a DB, either Mongo or SqlExpress.
 The database should be called Library.
