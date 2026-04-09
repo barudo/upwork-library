@@ -20,22 +20,38 @@ export async function GET(request: Request) {
     const database = client.db("upwork-library");
     const books = database.collection("books");
 
-    let booksData;
+    let pipeline = [];
+
     if (query && query.trim()) {
       // Search in title, author, and genre
       const searchRegex = new RegExp(query.trim(), "i");
-      booksData = await books
-        .find({
+      pipeline.push({
+        $match: {
           $or: [
             { title: searchRegex },
             { author: searchRegex },
             { genre: searchRegex },
           ],
-        })
-        .toArray();
-    } else {
-      booksData = await books.find({}).toArray();
+        },
+      });
     }
+
+    pipeline.push({
+      $lookup: {
+        from: "subscribers",
+        let: { bookId: "$_id" },
+        pipeline: [{ $match: { $expr: { $in: ["$$bookId", "$loans"] } } }],
+        as: "borrower",
+      },
+    });
+
+    pipeline.push({
+      $addFields: {
+        borrower: { $ifNull: [{ $arrayElemAt: ["$borrower", 0] }, null] },
+      },
+    });
+
+    const booksData = await books.aggregate(pipeline).toArray();
 
     return NextResponse.json(booksData);
   } catch (error) {

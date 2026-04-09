@@ -1,4 +1,5 @@
 import Link from "next/link";
+import AddSubscriberButton from "@/components/AddSubscriberButton";
 
 export default function Home() {
   return (
@@ -14,7 +15,7 @@ export default function Home() {
           </p>
           <div className="flex gap-4">
             <Link
-              href="/manage"
+              href="/subscribers"
               className="rounded-md bg-black px-4 py-2 text-white hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
             >
               Manage Library
@@ -25,6 +26,7 @@ export default function Home() {
             >
               View Books
             </Link>
+            <AddSubscriberButton />
           </div>
         </div>
       </main>

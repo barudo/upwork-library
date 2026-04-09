@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import AddSubscriberModal from "@/components/AddSubscriberModal";
 
 interface Subscriber {
   _id: string;
@@ -14,10 +15,6 @@ export default function SubscribersPage() {
   const [loading, setLoading] = useState(true);
   const [displayMode, setDisplayMode] = useState<"grid" | "table">("grid");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [submitError, setSubmitError] = useState("");
-  const [submitting, setSubmitting] = useState(false);
 
   const fetchSubscribers = async () => {
     try {
@@ -140,102 +137,11 @@ export default function SubscribersPage() {
             </table>
           </div>
         )}
-        {isModalOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white dark:bg-zinc-900 rounded-lg p-6 w-full max-w-md mx-4">
-              <h2 className="text-2xl font-semibold text-black dark:text-zinc-50 mb-4">
-                Add Subscriber
-              </h2>
-              <form
-                onSubmit={async (event) => {
-                  event.preventDefault();
-                  setSubmitError("");
-                  setSubmitting(true);
-
-                  try {
-                    const response = await fetch("/api/subscribers", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ firstName, lastName }),
-                    });
-
-                    if (!response.ok) {
-                      const data = await response.json();
-                      throw new Error(data.error || "Failed to add subscriber");
-                    }
-
-                    setFirstName("");
-                    setLastName("");
-                    setIsModalOpen(false);
-                    fetchSubscribers();
-                  } catch (error) {
-                    setSubmitError(
-                      error instanceof Error
-                        ? error.message
-                        : "Unable to add subscriber",
-                    );
-                  } finally {
-                    setSubmitting(false);
-                  }
-                }}
-                className="space-y-4"
-              >
-                <div>
-                  <label
-                    htmlFor="firstName"
-                    className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1"
-                  >
-                    First Name
-                  </label>
-                  <input
-                    id="firstName"
-                    value={firstName}
-                    onChange={(event) => setFirstName(event.target.value)}
-                    className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-black dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-zinc-50"
-                    required
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="lastName"
-                    className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1"
-                  >
-                    Last Name
-                  </label>
-                  <input
-                    id="lastName"
-                    value={lastName}
-                    onChange={(event) => setLastName(event.target.value)}
-                    className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-black dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-zinc-50"
-                    required
-                  />
-                </div>
-                {submitError && (
-                  <div className="text-red-600 dark:text-red-400 text-sm">
-                    {submitError}
-                  </div>
-                )}
-                <div className="flex gap-3 pt-4">
-                  <button
-                    type="button"
-                    onClick={() => setIsModalOpen(false)}
-                    className="flex-1 px-4 py-2 text-zinc-700 dark:text-zinc-300 border border-zinc-300 dark:border-zinc-600 rounded-md hover:bg-zinc-50 dark:hover:bg-zinc-800"
-                    disabled={submitting}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="flex-1 px-4 py-2 bg-black dark:bg-zinc-50 text-white dark:text-black rounded-md hover:bg-zinc-800 dark:hover:bg-zinc-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                    disabled={submitting}
-                  >
-                    {submitting ? "Adding..." : "Add Subscriber"}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
+        <AddSubscriberModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onSubscriberAdded={fetchSubscribers}
+        />
       </main>
     </div>
   );

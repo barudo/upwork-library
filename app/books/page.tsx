@@ -4,12 +4,19 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import AddBookModal from "@/components/AddBookModal";
 
+interface Subscriber {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  email?: string;
+}
+
 interface Book {
   _id: string;
-  id: number;
   title: string;
   author: string;
   genre: string;
+  borrower: Subscriber | null;
 }
 
 export default function BooksPage() {
@@ -103,7 +110,7 @@ export default function BooksPage() {
                 <p className="text-zinc-600 dark:text-zinc-400 mb-1">
                   Author: {book.author}
                 </p>
-                <p className="text-zinc-600 dark:text-zinc-400">
+                <p className="text-zinc-600 dark:text-zinc-400 mb-1">
                   Genre:{" "}
                   <Link
                     href={`/genres/${encodeURIComponent(book.genre)}`}
@@ -113,6 +120,16 @@ export default function BooksPage() {
                     {book.genre}
                   </Link>
                 </p>
+                {book.borrower ? (
+                  <p className="text-red-600 dark:text-red-400 text-sm">
+                    Borrowed by: {book.borrower.firstName}{" "}
+                    {book.borrower.lastName}
+                  </p>
+                ) : (
+                  <p className="text-green-600 dark:text-green-400 text-sm">
+                    Available
+                  </p>
+                )}
               </Link>
             ))}
           </div>
@@ -129,6 +146,9 @@ export default function BooksPage() {
                   </th>
                   <th className="border border-zinc-300 dark:border-zinc-600 px-4 py-2 text-left text-black dark:text-zinc-50">
                     Genre
+                  </th>
+                  <th className="border border-zinc-300 dark:border-zinc-600 px-4 py-2 text-left text-black dark:text-zinc-50">
+                    Status
                   </th>
                 </tr>
               </thead>
@@ -156,6 +176,18 @@ export default function BooksPage() {
                       >
                         {book.genre}
                       </Link>
+                    </td>
+                    <td className="border border-zinc-300 dark:border-zinc-600 px-4 py-2">
+                      {book.borrower ? (
+                        <span className="text-red-600 dark:text-red-400">
+                          Borrowed by {book.borrower.firstName}{" "}
+                          {book.borrower.lastName}
+                        </span>
+                      ) : (
+                        <span className="text-green-600 dark:text-green-400">
+                          Available
+                        </span>
+                      )}
                     </td>
                   </tr>
                 ))}
