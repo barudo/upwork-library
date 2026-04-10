@@ -30,7 +30,13 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <header className="w-full border-b border-zinc-200 bg-white/80 backdrop-blur dark:border-zinc-800 dark:bg-black/60">
-          <div className="mx-auto flex w-full max-w-6xl items-center px-6 py-4">
+          <div className="mx-auto flex w-full max-w-6xl items-center gap-4 px-6 py-4">
+            <Link
+              href="/"
+              className="text-sm font-semibold text-zinc-900 transition-colors hover:text-black dark:text-zinc-100 dark:hover:text-white"
+            >
+              Home
+            </Link>
             <Link
               href="/manage"
               className="text-sm font-semibold text-zinc-900 transition-colors hover:text-black dark:text-zinc-100 dark:hover:text-white"
